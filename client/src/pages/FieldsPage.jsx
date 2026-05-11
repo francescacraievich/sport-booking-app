@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 
@@ -17,17 +17,23 @@ export default function FieldsPage() {
   const [sport, setSport] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const debounceRef = useRef(null);
 
   useEffect(() => {
-    setLoading(true);
-    api
-      .getFields(query || undefined)
-      .then((data) => {
-        setFields(data);
-        setError('');
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setLoading(true);
+      api
+        .getFields(query || undefined)
+        .then((data) => {
+          setFields(data);
+          setError('');
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    }, 300);
+
+    return () => clearTimeout(debounceRef.current);
   }, [query]);
 
   const displayed = sport ? fields.filter((f) => f.sport_type === sport) : fields;

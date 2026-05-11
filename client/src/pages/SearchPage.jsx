@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 
@@ -13,18 +13,16 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const runSearch = useCallback(async (q) => {
+    if (!q.trim()) return;
     setLoading(true);
     setError('');
-    setSearchParams({ q: query });
     try {
       const [fields, tournaments, teams, players] = await Promise.all([
-        api.getFields(query),
-        api.getTournaments(query),
-        api.getTeams(query),
-        api.getPlayersSearch(query),
+        api.getFields(q),
+        api.getTournaments(q),
+        api.getTeams(q),
+        api.getPlayersSearch(q),
       ]);
       setResults({ fields, tournaments, teams, players });
     } catch (err) {
@@ -32,6 +30,17 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    if (initialQuery) runSearch(initialQuery);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    setSearchParams({ q: query });
+    await runSearch(query);
   };
 
   const total = results
