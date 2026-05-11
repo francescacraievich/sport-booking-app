@@ -3,7 +3,7 @@ const pool = require('../config/db');
 
 const router = Router();
 
-// GET /api/users?q=query - List users (searchable)
+// GET /api/users?q=query
 router.get('/', async (req, res) => {
   try {
     const { q } = req.query;
@@ -39,26 +39,31 @@ router.get('/', async (req, res) => {
 
     res.json(users);
   } catch (err) {
+    console.error('GET /users error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// GET /api/users/:id - User details
+// GET /api/users/:id
 router.get('/:id', async (req, res) => {
   try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid user ID' });
+
     const result = await pool.query(
       'SELECT id, username, name, surname FROM users WHERE id = $1',
-      [req.params.id]
+      [id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
 
     const tournaments = await pool.query(
       'SELECT id, name, sport FROM tournaments WHERE creator_id = $1 ORDER BY created_at DESC',
-      [req.params.id]
+      [id]
     );
 
     res.json({ ...result.rows[0], tournaments: tournaments.rows });
   } catch (err) {
+    console.error('GET /users/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

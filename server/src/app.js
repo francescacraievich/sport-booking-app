@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 const pool = require('./config/db');
 
 const authRoutes = require('./routes/auth');
@@ -24,6 +25,7 @@ app.use(helmet());
 // API from the same origin (localhost:8080), so the browser never makes a
 // cross-origin request directly to this server.
 app.use(express.json());
+app.use(cookieParser());
 
 // Auth endpoints: max 10 requests per minute per IP (brute-force protection)
 app.use('/api/auth', rateLimit(60 * 1000, 10));
@@ -50,8 +52,12 @@ app.get('/api/whoami', authenticate, async (req, res) => {
       'SELECT id, username, name, surname FROM users WHERE id = $1',
       [req.user.id]
     );
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'User not found' });
+    }
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('GET /whoami error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

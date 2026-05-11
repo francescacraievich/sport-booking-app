@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
+    console.error('GET /teams error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

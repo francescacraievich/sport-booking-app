@@ -20,6 +20,7 @@ router.get('/', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('GET /bookings error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
