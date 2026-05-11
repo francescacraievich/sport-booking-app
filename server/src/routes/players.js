@@ -2,7 +2,7 @@ const { Router } = require('express');
 const pool = require('../config/db');
 const { authenticate } = require('../middleware/auth');
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 // GET /api/tournaments/:tournamentId/teams/:teamId/players - List players
 router.get('/', async (req, res) => {
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -23,6 +23,13 @@ router.post('/', authenticate, async (req, res) => {
     const tournament = await pool.query('SELECT * FROM tournaments WHERE id = $1', [req.params.tournamentId]);
     if (tournament.rows.length === 0) return res.status(404).json({ error: 'Tournament not found' });
     if (tournament.rows[0].creator_id !== req.user.id) return res.status(403).json({ error: 'Not the creator' });
+
+    // Verify the team belongs to this tournament (IDOR fix)
+    const teamCheck = await pool.query(
+      'SELECT id FROM teams WHERE id = $1 AND tournament_id = $2',
+      [req.params.teamId, req.params.tournamentId]
+    );
+    if (teamCheck.rows.length === 0) return res.status(404).json({ error: 'Team not found in this tournament' });
 
     const { name, surname, jersey_number } = req.body;
     if (!name || !surname) return res.status(400).json({ error: 'name and surname required' });
@@ -34,7 +41,7 @@ router.post('/', authenticate, async (req, res) => {
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

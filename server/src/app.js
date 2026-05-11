@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const helmet = require('helmet');
 const pool = require('./config/db');
 
 const authRoutes = require('./routes/auth');
@@ -9,21 +9,41 @@ const tournamentRoutes = require('./routes/tournaments');
 const matchRoutes = require('./routes/matches');
 const userRoutes = require('./routes/users');
 const playerRoutes = require('./routes/players');
+const bookingRoutes = require('./routes/bookings');
+const teamSearchRoutes = require('./routes/teams');
+const playerSearchRoutes = require('./routes/playersGlobal');
 const { authenticate } = require('./middleware/auth');
+const rateLimit = require('./middleware/rateLimit');
 
 const app = express();
 
-app.use(cors());
+// Security headers (X-Frame-Options, X-Content-Type-Options, etc.)
+app.use(helmet());
+
+// Note: CORS is not needed here — nginx reverse proxy serves both client and
+// API from the same origin (localhost:8080), so the browser never makes a
+// cross-origin request directly to this server.
 app.use(express.json());
 
-// Routes
+// Auth endpoints: max 10 requests per minute per IP (brute-force protection)
+app.use('/api/auth', rateLimit(60 * 1000, 10));
 app.use('/api/auth', authRoutes);
+
+// Resources
 app.use('/api/fields', fieldRoutes);
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/bookings', bookingRoutes);
 
-// Whoami endpoint
+// Global search endpoints (spec: search available for fields, tournaments, teams, players)
+app.use('/api/teams', teamSearchRoutes);
+app.use('/api/players', playerSearchRoutes);
+
+// Nested player routes under tournaments/:tournamentId/teams/:teamId/players
+app.use('/api/tournaments/:tournamentId/teams/:teamId/players', playerRoutes);
+
+// GET /api/whoami
 app.get('/api/whoami', authenticate, async (req, res) => {
   try {
     const result = await pool.query(
@@ -32,16 +52,9 @@ app.get('/api/whoami', authenticate, async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// Player routes (nested under tournaments)
-app.use('/api/tournaments/:tournamentId/teams/:teamId/players', (req, res, next) => {
-  req.params.tournamentId = req.params.tournamentId;
-  req.params.teamId = req.params.teamId;
-  next();
-}, playerRoutes);
 
 const PORT = process.env.PORT || 3000;
 
