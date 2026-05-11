@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS players (
     team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
     surname VARCHAR(100) NOT NULL,
-    jersey_number INTEGER
+    jersey_number INTEGER CHECK (jersey_number >= 1 AND jersey_number <= 99),
+    UNIQUE (team_id, jersey_number)
 );
 
 -- Matches
