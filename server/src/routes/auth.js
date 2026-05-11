@@ -5,6 +5,21 @@ const pool = require('../config/db');
 
 const router = Router();
 
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  // secure: true  — enable when deployed over HTTPS
+};
+
+function signToken(user) {
+  return jwt.sign(
+    { id: user.id, username: user.username },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+}
+
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
   try {
@@ -13,19 +28,16 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Username: 3-30 chars, alphanumeric + underscore + dot, no spaces
     if (!/^[a-zA-Z0-9_.]{3,30}$/.test(username)) {
       return res.status(400).json({
         error: 'Username must be 3-30 characters, letters, numbers, underscores and dots only',
       });
     }
 
-    // Password: minimum 6 characters
     if (password.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    // Name/surname: non-empty after trim
     if (!name.trim() || !surname.trim()) {
       return res.status(400).json({ error: 'Name and surname cannot be empty' });
     }
@@ -42,13 +54,8 @@ router.post('/signup', async (req, res) => {
     );
 
     const user = result.rows[0];
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.status(201).json({ token, user });
+    res.cookie('token', signToken(user), COOKIE_OPTS);
+    res.status(201).json({ user });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -73,19 +80,18 @@ router.post('/signin', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.json({
-      token,
-      user: { id: user.id, username: user.username, name: user.name, surname: user.surname },
-    });
+    const safeUser = { id: user.id, username: user.username, name: user.name, surname: user.surname };
+    res.cookie('token', signToken(safeUser), COOKIE_OPTS);
+    res.json({ user: safeUser });
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// POST /api/auth/signout
+router.post('/signout', (req, res) => {
+  res.clearCookie('token', { httpOnly: true, sameSite: 'lax' });
+  res.json({ message: 'Signed out' });
 });
 
 module.exports = router;

@@ -1,11 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-// Required authentication - rejects if no valid token
 function authenticate(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header) return res.status(401).json({ error: 'Token required' });
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'Token required' });
 
-  const token = header.split(' ')[1];
   try {
     req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
@@ -14,12 +12,10 @@ function authenticate(req, res, next) {
   }
 }
 
-// Optional authentication - attaches user if token present, continues otherwise
 function optionalAuth(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header) return next();
+  const token = req.cookies.token;
+  if (!token) return next();
 
-  const token = header.split(' ')[1];
   try {
     req.user = jwt.verify(token, process.env.JWT_SECRET);
   } catch {
