@@ -4,11 +4,24 @@ const { authenticate } = require('../middleware/auth');
 
 const router = Router();
 
+// Compute tournament status: 'upcoming' | 'active' | 'completed'
+function computeStatus(startDate, totalMatches, playedMatches) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (new Date(startDate) > today) return 'upcoming';
+  if (totalMatches > 0 && playedMatches === totalMatches) return 'completed';
+  return 'active';
+}
+
 // GET /api/tournaments?q=query - List tournaments
 router.get('/', async (req, res) => {
   try {
     const { q } = req.query;
-    let query = 'SELECT t.*, u.username AS creator_username FROM tournaments t JOIN users u ON t.creator_id = u.id';
+    let query = `SELECT t.*, u.username AS creator_username,
+      (SELECT COUNT(*)::int FROM teams WHERE tournament_id = t.id) AS teams_count,
+      (SELECT COUNT(*)::int FROM matches WHERE tournament_id = t.id) AS total_matches,
+      (SELECT COUNT(*)::int FROM matches WHERE tournament_id = t.id AND score1 IS NOT NULL) AS played_matches
+      FROM tournaments t JOIN users u ON t.creator_id = u.id`;
     const params = [];
 
     if (q) {
@@ -18,9 +31,13 @@ router.get('/', async (req, res) => {
 
     query += ' ORDER BY t.created_at DESC';
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    const rows = result.rows.map(t => ({
+      ...t,
+      status: computeStatus(t.start_date, t.total_matches, t.played_matches),
+    }));
+    res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -37,14 +54,23 @@ router.post('/', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Sport must be football, volleyball, or basketball' });
     }
 
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(start_date)) {
+      return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+    }
+
+    const maxTeamsInt = parseInt(max_teams, 10);
+    if (isNaN(maxTeamsInt) || maxTeamsInt < 2) {
+      return res.status(400).json({ error: 'max_teams must be an integer >= 2' });
+    }
+
     const result = await pool.query(
       'INSERT INTO tournaments (name, sport, max_teams, start_date, creator_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [name, sport, max_teams, start_date, req.user.id]
+      [name, sport, maxTeamsInt, start_date, req.user.id]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -72,13 +98,23 @@ router.get('/:id', async (req, res) => {
       [req.params.id]
     );
 
+    const matchesWithStatus = matches.rows.map(m => ({
+      ...m,
+      status: m.score1 !== null ? 'played' : 'upcoming',
+    }));
+
+    const t = tournament.rows[0];
+    const totalMatches = matchesWithStatus.length;
+    const playedMatches = matchesWithStatus.filter(m => m.status === 'played').length;
+
     res.json({
-      ...tournament.rows[0],
+      ...t,
+      status: computeStatus(t.start_date, totalMatches, playedMatches),
       teams: teams.rows,
-      matches: matches.rows,
+      matches: matchesWithStatus,
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -90,18 +126,35 @@ router.put('/:id', authenticate, async (req, res) => {
     if (tournament.rows[0].creator_id !== req.user.id) return res.status(403).json({ error: 'Not the creator' });
 
     const { name, max_teams, start_date } = req.body;
+
+    if (max_teams !== undefined) {
+      const maxTeamsInt = parseInt(max_teams, 10);
+      if (isNaN(maxTeamsInt) || maxTeamsInt < 2) {
+        return res.status(400).json({ error: 'max_teams must be an integer >= 2' });
+      }
+      const teamCount = await pool.query(
+        'SELECT COUNT(*)::int AS cnt FROM teams WHERE tournament_id = $1',
+        [req.params.id]
+      );
+      if (maxTeamsInt < teamCount.rows[0].cnt) {
+        return res.status(400).json({
+          error: `Cannot reduce max_teams below current team count (${teamCount.rows[0].cnt})`,
+        });
+      }
+    }
+
     const result = await pool.query(
       `UPDATE tournaments SET
         name = COALESCE($1, name),
         max_teams = COALESCE($2, max_teams),
         start_date = COALESCE($3, start_date)
        WHERE id = $4 RETURNING *`,
-      [name, max_teams, start_date, req.params.id]
+      [name, max_teams ?? null, start_date ?? null, req.params.id]
     );
 
     res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -115,7 +168,7 @@ router.delete('/:id', authenticate, async (req, res) => {
     await pool.query('DELETE FROM tournaments WHERE id = $1', [req.params.id]);
     res.json({ message: 'Tournament deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -132,16 +185,19 @@ router.post('/:id/teams', authenticate, async (req, res) => {
     }
 
     const { name } = req.body;
-    if (!name) return res.status(400).json({ error: 'Team name required' });
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Team name required' });
 
     const result = await pool.query(
       'INSERT INTO teams (name, tournament_id) VALUES ($1, $2) RETURNING *',
-      [name, req.params.id]
+      [name.trim(), req.params.id]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.code === '23505') {
+      return res.status(409).json({ error: 'A team with this name already exists in the tournament' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -153,7 +209,20 @@ router.post('/:id/matches/generate', authenticate, async (req, res) => {
     if (tournament.rows[0].creator_id !== req.user.id) return res.status(403).json({ error: 'Not the creator' });
 
     const teams = await pool.query('SELECT * FROM teams WHERE tournament_id = $1 ORDER BY id', [req.params.id]);
-    if (teams.rows.length < 2) return res.status(400).json({ error: 'At least 2 teams required' });
+    if (teams.rows.length < tournament.rows[0].max_teams) {
+      return res.status(400).json({
+        error: `All teams must be registered before generating the schedule (${teams.rows.length}/${tournament.rows[0].max_teams})`,
+      });
+    }
+
+    // Block regeneration if any match already has a result
+    const playedCheck = await pool.query(
+      'SELECT COUNT(*)::int AS cnt FROM matches WHERE tournament_id = $1 AND score1 IS NOT NULL',
+      [req.params.id]
+    );
+    if (playedCheck.rows[0].cnt > 0) {
+      return res.status(409).json({ error: 'Cannot regenerate schedule: some matches already have results' });
+    }
 
     // Delete existing matches
     await pool.query('DELETE FROM matches WHERE tournament_id = $1', [req.params.id]);
@@ -192,7 +261,7 @@ router.post('/:id/matches/generate', authenticate, async (req, res) => {
 
     res.status(201).json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -208,9 +277,10 @@ router.get('/:id/matches', async (req, res) => {
        ORDER BY m.date, m.id`,
       [req.params.id]
     );
-    res.json(result.rows);
+    const rows = result.rows.map(m => ({ ...m, status: m.score1 !== null ? 'played' : 'upcoming' }));
+    res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -269,7 +339,7 @@ router.get('/:id/standings', async (req, res) => {
 
     res.json(sorted);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
