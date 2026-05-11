@@ -1,14 +1,16 @@
 const BASE = '/api';
 
 async function req(endpoint, opts = {}) {
-  const token = localStorage.getItem('token');
   const headers = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...opts.headers,
   };
 
-  const res = await fetch(`${BASE}${endpoint}`, { ...opts, headers });
+  const res = await fetch(`${BASE}${endpoint}`, {
+    ...opts,
+    headers,
+    credentials: 'include', // send httpOnly cookie automatically
+  });
   const data = await res.json().catch(() => null);
 
   if (!res.ok) throw new Error((data && data.error) || `Errore ${res.status}`);
@@ -21,6 +23,7 @@ export const api = {
   // Auth
   signup: (d) => req('/auth/signup', { method: 'POST', body: body(d) }),
   signin: (d) => req('/auth/signin', { method: 'POST', body: body(d) }),
+  signout: () => req('/auth/signout', { method: 'POST' }),
   whoami: () => req('/whoami'),
 
   // Fields
