@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 
@@ -9,17 +9,23 @@ export default function UsersPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const debounceRef = useRef(null);
 
   useEffect(() => {
-    setLoading(true);
-    api
-      .getUsers(query || undefined)
-      .then((data) => {
-        setUsers(data);
-        setError('');
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setLoading(true);
+      api
+        .getUsers(query || undefined)
+        .then((data) => {
+          setUsers(data);
+          setError('');
+        })
+        .catch((e) => setError(e.message))
+        .finally(() => setLoading(false));
+    }, 300);
+
+    return () => clearTimeout(debounceRef.current);
   }, [query]);
 
   return (
@@ -50,7 +56,7 @@ export default function UsersPage() {
       ) : (
         <div className="users-list">
           {users.map((u) => (
-            <div key={u.id} className="card user-card">
+            <Link key={u.id} to={`/users/${u.id}`} className="card user-card">
               <div className="user-info">
                 <div className="user-avatar">{u.name[0]}{u.surname[0]}</div>
                 <div>
@@ -65,17 +71,17 @@ export default function UsersPage() {
                   <p className="user-tournaments-label">Tornei creati:</p>
                   <div className="tournament-tags">
                     {u.tournaments.map((t) => (
-                      <Link key={t.id} to={`/tournaments/${t.id}`} className="tournament-tag">
+                      <span key={t.id} className="tournament-tag">
                         <span className={`badge-dot badge-dot-${t.sport}`} />
                         {t.name}
-                      </Link>
+                      </span>
                     ))}
                   </div>
                 </div>
               ) : (
                 <p className="no-tournaments">Nessun torneo creato</p>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       )}

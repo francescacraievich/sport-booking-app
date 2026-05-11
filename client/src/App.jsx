@@ -11,6 +11,7 @@ import TournamentsPage from './pages/TournamentsPage';
 import TournamentDetailPage from './pages/TournamentDetailPage';
 import TournamentFormPage from './pages/TournamentFormPage';
 import UsersPage from './pages/UsersPage';
+import UserDetailPage from './pages/UserDetailPage';
 import BookingsPage from './pages/BookingsPage';
 import SearchPage from './pages/SearchPage';
 
@@ -34,6 +35,7 @@ export default function App() {
             <ProtectedRoute><TournamentFormPage mode="edit" /></ProtectedRoute>
           } />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/:id" element={<UserDetailPage />} />
           <Route path="/bookings" element={
             <ProtectedRoute><BookingsPage /></ProtectedRoute>
           } />
