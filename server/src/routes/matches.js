@@ -4,9 +4,16 @@ const { authenticate } = require('../middleware/auth');
 
 const router = Router();
 
-// GET /api/matches/:id - Match details
+function isValidDate(str) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(Date.parse(str));
+}
+
+// GET /api/matches/:id
 router.get('/:id', async (req, res) => {
   try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid match ID' });
+
     const result = await pool.query(
       `SELECT m.*, t1.name AS team1_name, t2.name AS team2_name, f.name AS field_name,
               t.name AS tournament_name, t.sport, t.creator_id
@@ -16,7 +23,7 @@ router.get('/:id', async (req, res) => {
        JOIN tournaments t ON m.tournament_id = t.id
        LEFT JOIN fields f ON m.field_id = f.id
        WHERE m.id = $1`,
-      [req.params.id]
+      [id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Match not found' });
 
@@ -25,16 +32,21 @@ router.get('/:id', async (req, res) => {
 
     res.json(match);
   } catch (err) {
+    console.error('GET /matches/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// PUT /api/matches/:id - Update match metadata: field, date (creator only, match not yet played)
+// PUT /api/matches/:id - Update field/date (creator only, not yet played)
 router.put('/:id', authenticate, async (req, res) => {
   try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid match ID' });
+
     const match = await pool.query(
-      `SELECT m.*, t.creator_id FROM matches m JOIN tournaments t ON m.tournament_id = t.id WHERE m.id = $1`,
-      [req.params.id]
+      `SELECT m.*, t.creator_id, t.sport
+       FROM matches m JOIN tournaments t ON m.tournament_id = t.id WHERE m.id = $1`,
+      [id]
     );
     if (match.rows.length === 0) return res.status(404).json({ error: 'Match not found' });
     if (match.rows[0].creator_id !== req.user.id) {
@@ -46,14 +58,17 @@ router.put('/:id', authenticate, async (req, res) => {
 
     const { field_id, date } = req.body;
 
+    let fieldIdInt = null;
     if (field_id !== undefined && field_id !== null) {
-      const fieldCheck = await pool.query('SELECT id FROM fields WHERE id = $1', [field_id]);
+      fieldIdInt = parseInt(field_id, 10);
+      if (isNaN(fieldIdInt)) return res.status(400).json({ error: 'Invalid field_id' });
+      const fieldCheck = await pool.query('SELECT id FROM fields WHERE id = $1', [fieldIdInt]);
       if (fieldCheck.rows.length === 0) {
         return res.status(400).json({ error: 'Field not found' });
       }
     }
 
-    if (date !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (date !== undefined && !isValidDate(date)) {
       return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
     }
 
@@ -62,11 +77,12 @@ router.put('/:id', authenticate, async (req, res) => {
         field_id = COALESCE($1, field_id),
         date = COALESCE($2, date)
        WHERE id = $3 RETURNING *`,
-      [field_id ?? null, date ?? null, req.params.id]
+      [fieldIdInt, date ?? null, id]
     );
 
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('PUT /matches/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -74,17 +90,22 @@ router.put('/:id', authenticate, async (req, res) => {
 // PUT /api/matches/:id/result - Enter match result (creator only, after match date)
 router.put('/:id/result', authenticate, async (req, res) => {
   try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid match ID' });
+
     const match = await pool.query(
-      `SELECT m.*, t.creator_id FROM matches m JOIN tournaments t ON m.tournament_id = t.id WHERE m.id = $1`,
-      [req.params.id]
+      `SELECT m.*, t.creator_id, t.sport
+       FROM matches m JOIN tournaments t ON m.tournament_id = t.id WHERE m.id = $1`,
+      [id]
     );
     if (match.rows.length === 0) return res.status(404).json({ error: 'Match not found' });
     if (match.rows[0].creator_id !== req.user.id) {
       return res.status(403).json({ error: 'Not the tournament creator' });
     }
 
+    // UTC comparison to avoid timezone-dependent off-by-one errors
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0);
     if (new Date(match.rows[0].date) >= today) {
       return res.status(400).json({ error: 'Match date has not passed yet' });
     }
@@ -100,13 +121,18 @@ router.put('/:id/result', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'score1 and score2 must be non-negative integers' });
     }
 
+    if (s1 === s2 && match.rows[0].sport !== 'football') {
+      return res.status(400).json({ error: 'Draws are not allowed in volleyball/basketball' });
+    }
+
     const result = await pool.query(
       'UPDATE matches SET score1 = $1, score2 = $2 WHERE id = $3 RETURNING *',
-      [s1, s2, req.params.id]
+      [s1, s2, id]
     );
 
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('PUT /matches/:id/result error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
