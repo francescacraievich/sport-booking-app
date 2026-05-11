@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS tournaments (
 CREATE TABLE IF NOT EXISTS teams (
     id SERIAL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
-    tournament_id INTEGER NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE
+    tournament_id INTEGER NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE,
+    UNIQUE(name, tournament_id)
 );
 
 -- Players
@@ -70,8 +71,9 @@ CREATE TABLE IF NOT EXISTS matches (
     team2_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
     date DATE NOT NULL,
     field_id INTEGER REFERENCES fields(id),
-    score1 INTEGER,
-    score2 INTEGER
+    score1 INTEGER CHECK (score1 >= 0),
+    score2 INTEGER CHECK (score2 >= 0),
+    CHECK (team1_id <> team2_id)
 );
 
 -- Seed some sample fields with slots
@@ -95,3 +97,10 @@ BEGIN
         END LOOP;
     END LOOP;
 END $$;
+
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_bookings_user_id    ON bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_slot_date  ON bookings(slot_id, date);
+CREATE INDEX IF NOT EXISTS idx_teams_tournament    ON teams(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_players_team        ON players(team_id);
+CREATE INDEX IF NOT EXISTS idx_matches_tournament  ON matches(tournament_id);

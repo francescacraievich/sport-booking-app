@@ -1,23 +1,46 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import FieldsPage from './pages/FieldsPage';
+import FieldDetailPage from './pages/FieldDetailPage';
+import TournamentsPage from './pages/TournamentsPage';
+import TournamentDetailPage from './pages/TournamentDetailPage';
+import TournamentFormPage from './pages/TournamentFormPage';
+import UsersPage from './pages/UsersPage';
+import BookingsPage from './pages/BookingsPage';
+import SearchPage from './pages/SearchPage';
+
+export default function App() {
   return (
-    <div className="app">
-      <header>
-        <h1>Sport Booking</h1>
-        <nav>
-          <a href="/">Home</a>
-          <a href="/fields">Fields</a>
-          <a href="/tournaments">Tournaments</a>
-        </nav>
-      </header>
-      <main>
+    <AuthProvider>
+      <Navbar />
+      <main className="main-content">
         <Routes>
-          <Route path="/" element={<h2>Welcome to Sport Booking</h2>} />
+          <Route path="/" element={<Navigate to="/fields" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/fields" element={<FieldsPage />} />
+          <Route path="/fields/:id" element={<FieldDetailPage />} />
+          <Route path="/tournaments" element={<TournamentsPage />} />
+          <Route path="/tournaments/new" element={
+            <ProtectedRoute><TournamentFormPage mode="create" /></ProtectedRoute>
+          } />
+          <Route path="/tournaments/:id" element={<TournamentDetailPage />} />
+          <Route path="/tournaments/:id/edit" element={
+            <ProtectedRoute><TournamentFormPage mode="edit" /></ProtectedRoute>
+          } />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/bookings" element={
+            <ProtectedRoute><BookingsPage /></ProtectedRoute>
+          } />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="*" element={<Navigate to="/fields" replace />} />
         </Routes>
       </main>
-    </div>
+    </AuthProvider>
   );
 }
-
-export default App;
