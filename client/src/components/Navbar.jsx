@@ -14,7 +14,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <NavLink to="/fields" className="navbar-brand">
-          ⚽ SportBooking
+          SportBooking
         </NavLink>
 
         <div className="navbar-center">

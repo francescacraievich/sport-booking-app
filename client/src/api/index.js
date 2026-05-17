@@ -27,7 +27,13 @@ export const api = {
   whoami: () => req('/whoami'),
 
   // Fields
-  getFields: (q) => req(`/fields${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  getFields: (q, sport) => {
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (sport) params.set('sport', sport);
+    const qs = params.toString();
+    return req(`/fields${qs ? `?${qs}` : ''}`);
+  },
   getField: (id) => req(`/fields/${id}`),
   getSlots: (fieldId, date) => req(`/fields/${fieldId}/slots?date=${date}`),
   bookSlot: (fieldId, d) => req(`/fields/${fieldId}/bookings`, { method: 'POST', body: body(d) }),

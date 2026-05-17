@@ -106,7 +106,7 @@ router.put('/:id/result', authenticate, async (req, res) => {
     // UTC comparison to avoid timezone-dependent off-by-one errors
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
-    if (new Date(match.rows[0].date) >= today) {
+    if (new Date(match.rows[0].date) > today) {
       return res.status(400).json({ error: 'Match date has not passed yet' });
     }
 

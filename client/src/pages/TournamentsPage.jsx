@@ -98,9 +98,9 @@ export default function TournamentsPage() {
               </div>
               <h3 className="card-title">{t.name}</h3>
               <p className="card-subtitle">
-                <span className="icon">👤</span> {t.creator_username}
+                {t.creator_username}
                 &nbsp;&nbsp;
-                <span className="icon">📅</span> {formatDate(t.start_date)}
+                {formatDate(t.start_date)}
               </p>
               <Link to={`/tournaments/${t.id}`} className="btn btn-primary btn-sm card-action">
                 Dettagli →

@@ -331,7 +331,7 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
       <div className="section-top">
         {canGenerate && (
           <button className="btn btn-primary btn-sm" onClick={handleGenerate} disabled={generating}>
-            {generating ? 'Generazione...' : '⚙ Genera calendario'}
+            {generating ? 'Generazione...' : 'Genera calendario'}
           </button>
         )}
         {isCreator && !allTeamsRegistered && (
@@ -355,7 +355,7 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
                 <div className="match-date">
                   {formatDate(m.date)}
                   {m.field_name && !isCreator && (
-                    <span className="match-field-label"> · 📍 {m.field_name}</span>
+                    <span className="match-field-label"> · {m.field_name}</span>
                   )}
                 </div>
                 <div className="match-teams">
@@ -401,12 +401,12 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
                         className="btn btn-outline btn-xs"
                         onClick={() => setFieldForms((prev) => ({ ...prev, [m.id]: true }))}
                       >
-                        📍 {m.field_name ? m.field_name : 'Assegna campo'}
+                        {m.field_name ? m.field_name : 'Assegna campo'}
                       </button>
                     )
                   )}
                   {played && m.field_name && (
-                    <span className="match-field-label">📍 {m.field_name}</span>
+                    <span className="match-field-label">{m.field_name}</span>
                   )}
                   {canEnter && !resultForms[m.id] && (
                     <button
@@ -593,27 +593,27 @@ export default function TournamentDetailPage() {
                 {SPORT_LABEL[tournament.sport]}
               </span>
               <span className="meta-item">
-                👤 {tournament.creator_username}
+                {tournament.creator_username}
               </span>
               <span className="meta-item">
-                📅 Inizio: {formatDate(tournament.start_date)}
+                Inizio: {formatDate(tournament.start_date)}
               </span>
               <span className="meta-item">
-                🏆 Max squadre: {tournament.max_teams}
+                Max squadre: {tournament.max_teams}
               </span>
             </div>
           </div>
           {isCreator && (
             <div className="creator-actions">
               <Link to={`/tournaments/${id}/edit`} className="btn btn-secondary btn-sm">
-                ✏️ Modifica
+                Modifica
               </Link>
               <button
                 className="btn btn-danger btn-sm"
                 onClick={handleDelete}
                 disabled={deleting}
               >
-                {deleting ? '...' : '🗑 Elimina'}
+                {deleting ? '...' : 'Elimina'}
               </button>
             </div>
           )}
@@ -627,9 +627,9 @@ export default function TournamentDetailPage() {
             className={`tab-btn${activeTab === tab ? ' active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
-            {tab === 'teams' && '👥 Squadre'}
-            {tab === 'matches' && '⚽ Partite'}
-            {tab === 'standings' && '🏅 Classifica'}
+            {tab === 'teams' && 'Squadre'}
+            {tab === 'matches' && 'Partite'}
+            {tab === 'standings' && 'Classifica'}
           </button>
         ))}
       </div>

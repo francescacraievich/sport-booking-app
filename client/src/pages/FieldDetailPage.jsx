@@ -94,7 +94,7 @@ export default function FieldDetailPage() {
           <div>
             <h1 className="page-title">{field.name}</h1>
             <p className="field-address">
-              <span className="icon">📍</span> {field.address}
+              {field.address}
             </p>
           </div>
           <span className={`badge badge-lg badge-${field.sport_type}`}>

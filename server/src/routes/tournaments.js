@@ -100,10 +100,11 @@ router.get('/:id', async (req, res) => {
     );
 
     const matches = await pool.query(
-      `SELECT m.*, t1.name AS team1_name, t2.name AS team2_name
+      `SELECT m.*, t1.name AS team1_name, t2.name AS team2_name, f.name AS field_name
        FROM matches m
        JOIN teams t1 ON m.team1_id = t1.id
        JOIN teams t2 ON m.team2_id = t2.id
+       LEFT JOIN fields f ON m.field_id = f.id
        WHERE m.tournament_id = $1
        ORDER BY m.date, m.id`,
       [id]
@@ -319,10 +320,11 @@ router.get('/:id/matches', async (req, res) => {
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid tournament ID' });
 
     const result = await pool.query(
-      `SELECT m.*, t1.name AS team1_name, t2.name AS team2_name
+      `SELECT m.*, t1.name AS team1_name, t2.name AS team2_name, f.name AS field_name
        FROM matches m
        JOIN teams t1 ON m.team1_id = t1.id
        JOIN teams t2 ON m.team2_id = t2.id
+       LEFT JOIN fields f ON m.field_id = f.id
        WHERE m.tournament_id = $1
        ORDER BY m.date, m.id`,
       [id]

@@ -24,7 +24,7 @@ export default function FieldsPage() {
     debounceRef.current = setTimeout(() => {
       setLoading(true);
       api
-        .getFields(query || undefined)
+        .getFields(query || undefined, sport || undefined)
         .then((data) => {
           setFields(data);
           setError('');
@@ -34,9 +34,9 @@ export default function FieldsPage() {
     }, 300);
 
     return () => clearTimeout(debounceRef.current);
-  }, [query]);
+  }, [query, sport]);
 
-  const displayed = sport ? fields.filter((f) => f.sport_type === sport) : fields;
+  const displayed = fields;
 
   return (
     <div className="page">
@@ -83,7 +83,7 @@ export default function FieldsPage() {
               </div>
               <h3 className="card-title">{field.name}</h3>
               <p className="card-subtitle">
-                <span className="icon">📍</span> {field.address}
+                {field.address}
               </p>
               <Link to={`/fields/${field.id}`} className="btn btn-primary btn-sm card-action">
                 Prenota →
