@@ -96,10 +96,10 @@ export default function BookingsPage() {
                         </Link>
                       </h3>
                       <p className="booking-details">
-                        📅 {formatDate(b.date)} &nbsp;|&nbsp; 🕐 {formatTime(b.start_time)} –{' '}
+                        {formatDate(b.date)} &nbsp;|&nbsp; {formatTime(b.start_time)} –{' '}
                         {formatTime(b.end_time)}
                       </p>
-                      <p className="booking-address">📍 {b.address}</p>
+                      <p className="booking-address">{b.address}</p>
                     </div>
                     <button
                       className="btn btn-danger btn-sm"
@@ -128,7 +128,7 @@ export default function BookingsPage() {
                     <div className="booking-info">
                       <h3 className="booking-field">{b.field_name}</h3>
                       <p className="booking-details">
-                        📅 {formatDate(b.date)} &nbsp;|&nbsp; 🕐 {formatTime(b.start_time)} –{' '}
+                        {formatDate(b.date)} &nbsp;|&nbsp; {formatTime(b.start_time)} –{' '}
                         {formatTime(b.end_time)}
                       </p>
                     </div>

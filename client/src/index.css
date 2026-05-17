@@ -522,8 +522,10 @@ input, select, textarea { font-family: inherit; }
 .team-players { padding: 0 1rem 1rem; }
 
 .players-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-.players-table th { font-weight: 600; color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); }
+.players-table th { font-weight: 600; color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); text-align: left; }
 .players-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #f1f5f9; }
+.players-table th:nth-child(1), .players-table td:nth-child(1) { width: 2.5rem; text-align: center; }
+.players-table th:nth-child(4), .players-table td:nth-child(4) { width: 5rem; text-align: center; }
 
 .add-player-section { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
 

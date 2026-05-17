@@ -8,19 +8,27 @@ function isValidDate(str) {
   return /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(Date.parse(str));
 }
 
-// GET /api/fields?q=query
+// GET /api/fields?q=query&sport=football
 router.get('/', async (req, res) => {
   try {
-    const { q } = req.query;
-    let query = 'SELECT * FROM fields';
+    const { q, sport } = req.query;
+    const conditions = [];
     const params = [];
 
     if (q) {
-      query += ' WHERE name ILIKE $1 OR sport_type ILIKE $1 OR address ILIKE $1';
       params.push(`%${q}%`);
+      conditions.push(`(name ILIKE $${params.length} OR sport_type ILIKE $${params.length} OR address ILIKE $${params.length})`);
     }
 
+    if (sport) {
+      params.push(sport);
+      conditions.push(`sport_type = $${params.length}`);
+    }
+
+    let query = 'SELECT * FROM fields';
+    if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
     query += ' ORDER BY name';
+
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {

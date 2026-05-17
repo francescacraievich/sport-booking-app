@@ -80,7 +80,7 @@ export default function SearchPage() {
 
           {results.fields.length > 0 && (
             <section className="results-section">
-              <h2 className="results-section-title">🏟 Campi ({results.fields.length})</h2>
+              <h2 className="results-section-title">Campi ({results.fields.length})</h2>
               {results.fields.map((f) => (
                 <Link key={f.id} to={`/fields/${f.id}`} className="result-item">
                   <span className={`badge badge-${f.sport_type}`}>{SPORT_LABEL[f.sport_type]}</span>
@@ -95,7 +95,7 @@ export default function SearchPage() {
 
           {results.tournaments.length > 0 && (
             <section className="results-section">
-              <h2 className="results-section-title">🏆 Tornei ({results.tournaments.length})</h2>
+              <h2 className="results-section-title">Tornei ({results.tournaments.length})</h2>
               {results.tournaments.map((t) => (
                 <Link key={t.id} to={`/tournaments/${t.id}`} className="result-item">
                   <span className={`badge badge-${t.sport}`}>{SPORT_LABEL[t.sport]}</span>
@@ -110,7 +110,7 @@ export default function SearchPage() {
 
           {results.teams.length > 0 && (
             <section className="results-section">
-              <h2 className="results-section-title">👥 Squadre ({results.teams.length})</h2>
+              <h2 className="results-section-title">Squadre ({results.teams.length})</h2>
               {results.teams.map((t) => (
                 <Link key={t.id} to={`/tournaments/${t.tournament_id}`} className="result-item">
                   <span className={`badge badge-${t.sport}`}>{SPORT_LABEL[t.sport]}</span>
@@ -125,7 +125,7 @@ export default function SearchPage() {
 
           {results.players.length > 0 && (
             <section className="results-section">
-              <h2 className="results-section-title">⚽ Giocatori ({results.players.length})</h2>
+              <h2 className="results-section-title">Giocatori ({results.players.length})</h2>
               {results.players.map((p) => (
                 <Link key={p.id} to={`/tournaments/${p.tournament_id}`} className="result-item">
                   <span className={`badge badge-${p.sport}`}>{SPORT_LABEL[p.sport]}</span>
