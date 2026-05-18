@@ -122,6 +122,7 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
             value={newTeamName}
             onChange={(e) => setNewTeamName(e.target.value)}
             placeholder="Nome squadra"
+            aria-label="Nome squadra"
             autoFocus
           />
           <button className="btn btn-success btn-sm" type="submit" disabled={addingTeam}>
@@ -161,10 +162,10 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
                     <table className="players-table">
                       <thead>
                         <tr>
-                          <th>#</th>
-                          <th>Nome</th>
-                          <th>Cognome</th>
-                          <th>Maglia</th>
+                          <th scope="col">#</th>
+                          <th scope="col">Nome</th>
+                          <th scope="col">Cognome</th>
+                          <th scope="col">Maglia</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -195,6 +196,7 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
                               setNewPlayer((p) => ({ ...p, name: e.target.value }))
                             }
                             placeholder="Nome"
+                            aria-label="Nome giocatore"
                             autoFocus
                           />
                           <input
@@ -205,6 +207,7 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
                               setNewPlayer((p) => ({ ...p, surname: e.target.value }))
                             }
                             placeholder="Cognome"
+                            aria-label="Cognome giocatore"
                           />
                           <input
                             className="form-control form-control-sm num-input"
@@ -214,6 +217,7 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
                               setNewPlayer((p) => ({ ...p, jersey_number: e.target.value }))
                             }
                             placeholder="N° maglia"
+                            aria-label="Numero maglia"
                             min="1"
                             max="99"
                           />
@@ -433,6 +437,7 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
                           }))
                         }
                         placeholder="0"
+                        aria-label={`Gol ${m.team1_name}`}
                       />
                       <span className="dash">–</span>
                       <input
@@ -447,6 +452,7 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
                           }))
                         }
                         placeholder="0"
+                        aria-label={`Gol ${m.team2_name}`}
                       />
                       <button
                         className="btn btn-success btn-xs"
@@ -505,13 +511,13 @@ function StandingsSection({ tournamentId, sport }) {
         <table className="table standings-table">
           <thead>
             <tr>
-              <th>Pos</th>
-              <th>Squadra</th>
-              <th title="Partite giocate">PG</th>
-              <th title="Punti">Pt</th>
-              <th title={isFootball ? 'Gol fatti' : 'Punti fatti'}>{isFootball ? 'GF' : 'PF'}</th>
-              <th title={isFootball ? 'Gol subiti' : 'Punti subiti'}>{isFootball ? 'GS' : 'PS'}</th>
-              <th title="Differenza">{isFootball ? 'DR' : 'DP'}</th>
+              <th scope="col">Pos</th>
+              <th scope="col">Squadra</th>
+              <th scope="col" title="Partite giocate">PG</th>
+              <th scope="col" title="Punti">Pt</th>
+              <th scope="col" title={isFootball ? 'Gol fatti' : 'Punti fatti'}>{isFootball ? 'GF' : 'PF'}</th>
+              <th scope="col" title={isFootball ? 'Gol subiti' : 'Punti subiti'}>{isFootball ? 'GS' : 'PS'}</th>
+              <th scope="col" title="Differenza">{isFootball ? 'DR' : 'DP'}</th>
             </tr>
           </thead>
           <tbody>

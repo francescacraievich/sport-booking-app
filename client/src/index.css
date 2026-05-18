@@ -582,7 +582,7 @@ input, select, textarea { font-family: inherit; }
 
 .match-status { display: flex; justify-content: center; }
 .match-actions { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
-.match-field-label { font-size: 0.78rem; color: var(--text-muted); }
+.match-field-label { font-size: 0.78rem; color: var(--muted); }
 .field-assign-form { display: flex; align-items: center; gap: 0.3rem; }
 
 .result-form {

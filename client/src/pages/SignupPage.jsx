@@ -41,8 +41,9 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Nome</label>
+              <label className="form-label" htmlFor="name">Nome</label>
               <input
+                id="name"
                 className="form-control"
                 type="text"
                 name="name"
@@ -53,8 +54,9 @@ export default function SignupPage() {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Cognome</label>
+              <label className="form-label" htmlFor="surname">Cognome</label>
               <input
+                id="surname"
                 className="form-control"
                 type="text"
                 name="surname"
@@ -65,8 +67,9 @@ export default function SignupPage() {
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Username</label>
+            <label className="form-label" htmlFor="username">Username</label>
             <input
+              id="username"
               className="form-control"
               type="text"
               name="username"
@@ -76,8 +79,9 @@ export default function SignupPage() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label" htmlFor="password">Password</label>
             <input
+              id="password"
               className="form-control"
               type="password"
               name="password"

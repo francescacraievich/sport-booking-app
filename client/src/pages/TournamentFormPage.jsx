@@ -93,8 +93,9 @@ export default function TournamentFormPage({ mode }) {
 
         <form className="card form-card" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Nome torneo *</label>
+            <label className="form-label" htmlFor="name">Nome torneo *</label>
             <input
+              id="name"
               className="form-control"
               type="text"
               name="name"
@@ -106,8 +107,9 @@ export default function TournamentFormPage({ mode }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Sport *</label>
+            <label className="form-label" htmlFor="sport">Sport *</label>
             <select
+              id="sport"
               className="form-control"
               name="sport"
               value={form.sport}
@@ -127,8 +129,9 @@ export default function TournamentFormPage({ mode }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">N° massimo squadre *</label>
+              <label className="form-label" htmlFor="max_teams">N° massimo squadre *</label>
               <input
+                id="max_teams"
                 className="form-control"
                 type="number"
                 name="max_teams"
@@ -141,8 +144,9 @@ export default function TournamentFormPage({ mode }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Data di inizio *</label>
+              <label className="form-label" htmlFor="start_date">Data di inizio *</label>
               <input
+                id="start_date"
                 className="form-control"
                 type="date"
                 name="start_date"

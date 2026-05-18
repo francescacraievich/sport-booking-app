@@ -106,8 +106,9 @@ export default function FieldDetailPage() {
       <div className="section">
         <h2 className="section-title">Disponibilità fasce orarie</h2>
         <div className="date-picker-row">
-          <label className="form-label">Seleziona data:</label>
+          <label className="form-label" htmlFor="slot-date">Seleziona data:</label>
           <input
+            id="slot-date"
             className="form-control date-input"
             type="date"
             value={date}
