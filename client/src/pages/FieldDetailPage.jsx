@@ -45,7 +45,7 @@ export default function FieldDetailPage() {
   }, [id, date]);
 
   useEffect(() => {
-    loadSlots();
+    loadSlots(); // eslint-disable-line react-hooks/set-state-in-effect
   }, [loadSlots]);
 
   const handleBook = async (slot) => {

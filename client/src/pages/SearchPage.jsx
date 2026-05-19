@@ -33,7 +33,7 @@ export default function SearchPage() {
   }, []);
 
   useEffect(() => {
-    if (initialQuery) runSearch(initialQuery);
+    if (initialQuery) runSearch(initialQuery); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = async (e) => {
