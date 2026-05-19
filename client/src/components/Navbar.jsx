@@ -54,6 +54,7 @@ export default function Navbar() {
           className="navbar-hamburger"
           onClick={() => setMenuOpen((o) => !o)}
           aria-label="Menu"
+          aria-expanded={menuOpen}
         >
           {menuOpen ? '✕' : '☰'}
         </button>
