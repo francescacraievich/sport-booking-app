@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api';
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
+import { SPORT_LABEL } from '../constants/sports';
+import Alert from '../components/Alert';
 
 export default function UserDetailPage() {
   const { id } = useParams();
@@ -19,7 +19,7 @@ export default function UserDetailPage() {
   }, [id]);
 
   if (loading) return <div className="loading">Caricamento profilo...</div>;
-  if (error) return <div className="alert alert-error">{error}</div>;
+  if (error) return <Alert>{error}</Alert>;
   if (!user) return null;
 
   return (

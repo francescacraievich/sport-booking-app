@@ -8,8 +8,8 @@ const router = Router();
 const COOKIE_OPTS = {
   httpOnly: true,
   sameSite: 'lax',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  // secure: true  — enable when deployed over HTTPS
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  secure: process.env.NODE_ENV === 'production',
 };
 
 function signToken(user) {

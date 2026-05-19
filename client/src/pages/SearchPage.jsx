@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
+import { SPORT_LABEL } from '../constants/sports';
+import Alert from '../components/Alert';
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -68,7 +68,7 @@ export default function SearchPage() {
         </button>
       </form>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      <Alert>{error}</Alert>
 
       {results && (
         <div className="search-results">

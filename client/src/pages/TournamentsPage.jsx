@@ -2,10 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
-
-const STATUS_LABEL = { upcoming: 'In arrivo', active: 'In corso', completed: 'Concluso' };
+import { SPORT_LABEL, STATUS_LABEL } from '../constants/sports';
+import Alert from '../components/Alert';
 const STATUS_CLASS = { upcoming: 'badge-upcoming', active: 'badge-active', completed: 'badge-played' };
 
 function formatDate(d) {
@@ -63,7 +61,7 @@ export default function TournamentsPage() {
         />
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      <Alert>{error}</Alert>
 
       {loading ? (
         <div className="loading">Caricamento tornei...</div>

@@ -2,12 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-
-const SPORTS = [
-  { value: 'football', label: 'Calcio' },
-  { value: 'volleyball', label: 'Pallavolo' },
-  { value: 'basketball', label: 'Basket' },
-];
+import { SPORT_OPTIONS } from '../constants/sports';
+import Alert from '../components/Alert';
 
 export default function TournamentFormPage({ mode }) {
   const { id } = useParams();
@@ -89,7 +85,7 @@ export default function TournamentFormPage({ mode }) {
       <div className="form-page">
         <h1 className="page-title">{isEdit ? 'Modifica torneo' : 'Crea nuovo torneo'}</h1>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        <Alert>{error}</Alert>
 
         <form className="card form-card" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -116,7 +112,7 @@ export default function TournamentFormPage({ mode }) {
               onChange={handleChange}
               disabled={isEdit}
             >
-              {SPORTS.map((s) => (
+              {SPORT_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>
                   {s.label}
                 </option>

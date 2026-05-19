@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -20,6 +21,7 @@ export default function App() {
     <AuthProvider>
       <Navbar />
       <main className="main-content">
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Navigate to="/fields" replace />} />
           <Route path="/login" element={<LoginPage />} />
@@ -42,6 +44,7 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<Navigate to="/fields" replace />} />
         </Routes>
+        </ErrorBoundary>
       </main>
     </AuthProvider>
   );
