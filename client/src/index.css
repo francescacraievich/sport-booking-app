@@ -4,7 +4,7 @@
   --primary-dark: #1d4ed8;
   --primary-light: #eff6ff;
   --bg: #f1f5f9;
-  --card: #ffffff;
+  --card: #fff;
   --border: #e2e8f0;
   --text: #1e293b;
   --muted: #64748b;
@@ -16,8 +16,8 @@
   --nav-bg: #0f172a;
   --radius: 10px;
   --radius-sm: 6px;
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow: 0 2px 12px rgb(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 4px rgb(0, 0, 0, 0.06);
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
 }
 
@@ -51,7 +51,7 @@ input, select, textarea { font-family: inherit; }
 .navbar {
   background: var(--nav-bg);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.25);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -98,13 +98,47 @@ input, select, textarea { font-family: inherit; }
   transition: color 0.15s, background 0.15s;
 }
 
-.nav-link:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
-.nav-link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
+.nav-link:hover { color: #fff; background: rgb(255, 255, 255, 0.08); }
+.nav-link.active { color: #fff; background: rgb(255, 255, 255, 0.12); }
 
 .nav-username {
   font-size: 0.875rem;
   color: #94a3b8;
   padding: 0 0.5rem;
+}
+
+.navbar-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  margin-left: auto;
+}
+
+.navbar-mobile-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--nav-bg);
+  border-top: 1px solid rgb(255, 255, 255, 0.08);
+  padding: 0.5rem 1rem 1rem;
+  gap: 0.25rem;
+}
+
+.navbar-mobile-menu .nav-link {
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.mobile-menu-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgb(255, 255, 255, 0.08);
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
@@ -143,7 +177,7 @@ input, select, textarea { font-family: inherit; }
 .btn-outline:not(:disabled):hover { background: var(--primary-light); }
 
 .btn-outline-light { background: transparent; color: #e2e8f0; border: 1.5px solid #475569; }
-.btn-outline-light:not(:disabled):hover { background: rgba(255,255,255,0.08); }
+.btn-outline-light:not(:disabled):hover { background: rgb(255,255,255,0.08); }
 
 .btn-light { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
 .btn-light:not(:disabled):hover { background: #e2e8f0; }
@@ -254,7 +288,7 @@ input, select, textarea { font-family: inherit; }
 .form-control:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgb(37, 99, 235, 0.1);
 }
 
 .form-control-sm { padding: 0.35rem 0.6rem; font-size: 0.85rem; }
@@ -610,6 +644,7 @@ input, select, textarea { font-family: inherit; }
 .table-responsive { overflow-x: auto; }
 
 .standings-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
 .standings-table th {
   padding: 0.6rem 0.75rem;
   text-align: left;
@@ -678,6 +713,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .tournament-tag:hover { background: #dbeafe; }
+.tournament-tag-sport { opacity: 0.65; font-size: 0.75rem; }
 
 .no-tournaments { color: var(--muted); font-size: 0.85rem; }
 
@@ -735,15 +771,26 @@ input, select, textarea { font-family: inherit; }
 .muted { color: var(--muted); }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .match-item {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    overflow: hidden;
+  }
+  .match-date {
+    white-space: normal;
+  }
+  .match-actions {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .main-content { padding: 1.25rem 1rem 3rem; }
 
   .navbar-center { display: none; }
-
-  .match-item {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
-  }
+  .navbar-actions { display: none; }
+  .navbar-hamburger { display: block; }
 
   .form-row { grid-template-columns: 1fr; }
 
@@ -761,7 +808,4 @@ input, select, textarea { font-family: inherit; }
 @media (max-width: 480px) {
   .tabs { gap: 0; }
   .tab-btn { padding: 0.5rem 0.75rem; font-size: 0.82rem; }
-
-  .navbar-actions .nav-link { display: none; }
-  .nav-username { display: none; }
 }

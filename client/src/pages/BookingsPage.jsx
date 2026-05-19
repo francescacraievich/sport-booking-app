@@ -61,7 +61,7 @@ export default function BookingsPage() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Le mie prenotazioni</h1>
+        <h1 className="page-title">Le prenotazioni di {user?.name}</h1>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}

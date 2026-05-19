@@ -73,6 +73,7 @@ export default function UsersPage() {
                     {u.tournaments.map((t) => (
                       <span key={t.id} className="tournament-tag">
                         <span className={`badge-dot badge-dot-${t.sport}`} />
+                        <span className="tournament-tag-sport">{SPORT_LABEL[t.sport]}</span>
                         {t.name}
                       </span>
                     ))}
