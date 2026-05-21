@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Alert from '../components/Alert';
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -36,7 +37,7 @@ export default function SignupPage() {
         <h1 className="auth-title">Registrazione</h1>
         <p className="auth-subtitle">Crea il tuo account SportBooking</p>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        <Alert>{error}</Alert>
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">

@@ -2,26 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
-
-function formatDate(d) {
-  if (!d) return '-';
-  return new Date(d).toLocaleDateString('it-IT');
-}
-
-function today() {
-  return new Date().toISOString().split('T')[0];
-}
-
-function matchDateStr(d) {
-  if (!d) return '';
-  return new Date(d).toISOString().split('T')[0];
-}
-
-function isPastDate(dateStr) {
-  return matchDateStr(dateStr) < today();
-}
+import { SPORT_LABEL } from '../constants/sports';
+import Alert from '../components/Alert';
+import { formatDate, isPastDate } from '../utils/dateUtils';
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
@@ -131,7 +114,7 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
         </form>
       )}
 
-      {error && <div className="alert alert-error">{error}</div>}
+      <Alert>{error}</Alert>
 
       {tournament.teams.length === 0 ? (
         <div className="empty-state">
@@ -330,7 +313,7 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
 
   return (
     <div className="tab-section">
-      {error && <div className="alert alert-error">{error}</div>}
+      <Alert>{error}</Alert>
 
       <div className="section-top">
         {canGenerate && (
@@ -486,21 +469,22 @@ function MatchesSection({ tournament, isCreator, onRefresh }) {
   );
 }
 
-function StandingsSection({ tournamentId, sport }) {
+function StandingsSection({ tournamentId, sport, refreshKey }) {
   const [standings, setStandings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     api
       .getStandings(tournamentId)
       .then(setStandings)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [tournamentId]);
+  }, [tournamentId, refreshKey]);
 
   if (loading) return <div className="loading">Caricamento classifica...</div>;
-  if (error) return <div className="alert alert-error">{error}</div>;
+  if (error) return <Alert>{error}</Alert>;
   if (standings.length === 0) return <div className="empty-state">Nessun dato disponibile.</div>;
 
   const isFootball = sport === 'football';
@@ -553,8 +537,10 @@ export default function TournamentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const load = useCallback(() => {
+    setRefreshKey((k) => k + 1);
     api
       .getTournament(id)
       .then(setTournament)
@@ -579,7 +565,7 @@ export default function TournamentDetailPage() {
   };
 
   if (loading) return <div className="loading">Caricamento torneo...</div>;
-  if (error) return <div className="alert alert-error">{error}</div>;
+  if (error) return <Alert>{error}</Alert>;
   if (!tournament) return null;
 
   const isCreator = user && user.id === tournament.creator_id;
@@ -626,10 +612,14 @@ export default function TournamentDetailPage() {
         </div>
       </div>
 
-      <div className="tabs">
+      <div className="tabs" role="tablist">
         {['teams', 'matches', 'standings'].map((tab) => (
           <button
             key={tab}
+            role="tab"
+            id={`tab-${tab}`}
+            aria-selected={activeTab === tab}
+            aria-controls={`panel-${tab}`}
             className={`tab-btn${activeTab === tab ? ' active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
@@ -642,13 +632,19 @@ export default function TournamentDetailPage() {
 
       <div className="tab-content">
         {activeTab === 'teams' && (
-          <TeamSection tournament={tournament} isCreator={isCreator} onRefresh={load} />
+          <div role="tabpanel" id="panel-teams" aria-labelledby="tab-teams">
+            <TeamSection tournament={tournament} isCreator={isCreator} onRefresh={load} />
+          </div>
         )}
         {activeTab === 'matches' && (
-          <MatchesSection tournament={tournament} isCreator={isCreator} onRefresh={load} />
+          <div role="tabpanel" id="panel-matches" aria-labelledby="tab-matches">
+            <MatchesSection tournament={tournament} isCreator={isCreator} onRefresh={load} />
+          </div>
         )}
         {activeTab === 'standings' && (
-          <StandingsSection tournamentId={id} sport={tournament.sport} />
+          <div role="tabpanel" id="panel-standings" aria-labelledby="tab-standings">
+            <StandingsSection tournamentId={id} sport={tournament.sport} refreshKey={refreshKey} />
+          </div>
         )}
       </div>
     </div>

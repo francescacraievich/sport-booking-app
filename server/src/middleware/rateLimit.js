@@ -7,6 +7,14 @@ function rateLimit(windowMs, max) {
   // Map<ip, timestamp[]> — persists across requests via closure
   const requests = new Map();
 
+  // Periodically remove entries with no recent requests to avoid unbounded growth
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, ts] of requests) {
+      if (!ts.some(t => now - t < windowMs)) requests.delete(ip);
+    }
+  }, windowMs);
+
   return function rateLimit(req, res, next) {
     const ip = req.ip;
     const now = Date.now();

@@ -13,6 +13,14 @@ router.get('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID' });
     }
 
+    const teamCheck = await pool.query(
+      'SELECT id FROM teams WHERE id = $1 AND tournament_id = $2',
+      [teamId, tournamentId]
+    );
+    if (teamCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Team not found in this tournament' });
+    }
+
     const result = await pool.query(
       'SELECT * FROM players WHERE team_id = $1 ORDER BY surname, name',
       [teamId]

@@ -2,25 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
-
-function today() {
-  return new Date().toISOString().split('T')[0];
-}
-
-function formatDate(d) {
-  if (!d) return '-';
-  return new Date(d).toLocaleDateString('it-IT');
-}
-
-function formatTime(t) {
-  return t ? t.substring(0, 5) : '';
-}
-
-function bookingDateStr(d) {
-  return new Date(d).toISOString().split('T')[0];
-}
+import { SPORT_LABEL } from '../constants/sports';
+import Alert from '../components/Alert';
+import { today, formatDate, formatTime, toDateStr } from '../utils/dateUtils';
 
 export default function BookingsPage() {
   const { user } = useAuth();
@@ -55,8 +39,8 @@ export default function BookingsPage() {
   };
 
   const todayStr = today();
-  const upcoming = bookings.filter((b) => bookingDateStr(b.date) >= todayStr);
-  const past = bookings.filter((b) => bookingDateStr(b.date) < todayStr);
+  const upcoming = bookings.filter((b) => toDateStr(b.date) >= todayStr);
+  const past = bookings.filter((b) => toDateStr(b.date) < todayStr);
 
   return (
     <div className="page">
@@ -64,8 +48,8 @@ export default function BookingsPage() {
         <h1 className="page-title">Le prenotazioni di {user?.name}</h1>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
+      <Alert>{error}</Alert>
+      <Alert type="success">{success}</Alert>
 
       {loading ? (
         <div className="loading">Caricamento prenotazioni...</div>

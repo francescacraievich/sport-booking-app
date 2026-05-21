@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const pool = require('../config/db');
 const { authenticate } = require('../middleware/auth');
+const { isValidDate } = require('../utils/validation');
 
 const router = Router();
 
@@ -10,10 +11,6 @@ function computeStatus(startDate, totalMatches, playedMatches) {
   if (new Date(startDate) > today) return 'upcoming';
   if (totalMatches > 0 && playedMatches === totalMatches) return 'completed';
   return 'active';
-}
-
-function isValidDate(str) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(Date.parse(str));
 }
 
 // GET /api/tournaments?q=query

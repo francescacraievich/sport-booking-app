@@ -1,15 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
+import { SPORT_LABEL, SPORT_OPTIONS_WITH_ALL } from '../constants/sports';
+import Alert from '../components/Alert';
 
-const SPORTS = [
-  { value: '', label: 'Tutti gli sport' },
-  { value: 'football', label: 'Calcio' },
-  { value: 'volleyball', label: 'Pallavolo' },
-  { value: 'basketball', label: 'Basket' },
-];
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
+const SPORTS = SPORT_OPTIONS_WITH_ALL;
 
 export default function FieldsPage() {
   const [fields, setFields] = useState([]);
@@ -35,8 +30,6 @@ export default function FieldsPage() {
 
     return () => clearTimeout(debounceRef.current);
   }, [query, sport]);
-
-  const displayed = fields;
 
   return (
     <div className="page">
@@ -66,15 +59,15 @@ export default function FieldsPage() {
         </div>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      <Alert>{error}</Alert>
 
       {loading ? (
         <div className="loading">Caricamento campi...</div>
-      ) : displayed.length === 0 ? (
+      ) : fields.length === 0 ? (
         <div className="empty-state">Nessun campo trovato.</div>
       ) : (
         <div className="card-grid">
-          {displayed.map((field) => (
+          {fields.map((field) => (
             <div key={field.id} className="card field-card">
               <div className="card-header">
                 <span className={`badge badge-${field.sport_type}`}>

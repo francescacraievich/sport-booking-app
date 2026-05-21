@@ -2,16 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-
-const SPORT_LABEL = { football: 'Calcio', volleyball: 'Pallavolo', basketball: 'Basket' };
-
-function toISODate(d) {
-  return d.toISOString().split('T')[0];
-}
-
-function formatTime(t) {
-  return t ? t.substring(0, 5) : '';
-}
+import { SPORT_LABEL } from '../constants/sports';
+import Alert from '../components/Alert';
+import { formatTime, toDateStr } from '../utils/dateUtils';
 
 export default function FieldDetailPage() {
   const { id } = useParams();
@@ -19,7 +12,7 @@ export default function FieldDetailPage() {
 
   const [field, setField] = useState(null);
   const [slots, setSlots] = useState([]);
-  const [date, setDate] = useState(toISODate(new Date()));
+  const [date, setDate] = useState(toDateStr(new Date()));
   const [fieldLoading, setFieldLoading] = useState(true);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [bookingSlot, setBookingSlot] = useState(null);
@@ -45,7 +38,7 @@ export default function FieldDetailPage() {
   }, [id, date]);
 
   useEffect(() => {
-    loadSlots(); // eslint-disable-line react-hooks/set-state-in-effect
+    loadSlots();
   }, [loadSlots]);
 
   const handleBook = async (slot) => {
@@ -79,9 +72,9 @@ export default function FieldDetailPage() {
   };
 
   if (fieldLoading) return <div className="loading">Caricamento...</div>;
-  if (!field) return <div className="alert alert-error">Campo non trovato.</div>;
+  if (!field) return <Alert>Campo non trovato.</Alert>;
 
-  const today = toISODate(new Date());
+  const today = toDateStr(new Date());
 
   return (
     <div className="page">
@@ -117,8 +110,8 @@ export default function FieldDetailPage() {
           />
         </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
+        <Alert>{error}</Alert>
+        <Alert type="success">{success}</Alert>
 
         {slotsLoading ? (
           <div className="loading">Caricamento fasce...</div>
