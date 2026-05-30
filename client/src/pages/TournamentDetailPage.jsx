@@ -24,8 +24,9 @@ function TeamSection({ tournament, isCreator, onRefresh }) {
     try {
       const players = await api.getPlayers(tournament.id, teamId);
       setPlayersByTeam((prev) => ({ ...prev, [teamId]: players }));
-    } catch {
-      // silently fail
+    } catch (err) {
+      setPlayersByTeam((prev) => ({ ...prev, [teamId]: [] }));
+      setError(err.message);
     }
   };
 

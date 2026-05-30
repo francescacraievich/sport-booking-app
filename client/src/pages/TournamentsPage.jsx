@@ -4,12 +4,9 @@ import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { SPORT_LABEL, STATUS_LABEL } from '../constants/sports';
 import Alert from '../components/Alert';
-const STATUS_CLASS = { upcoming: 'badge-upcoming', active: 'badge-active', completed: 'badge-played' };
+import { formatDate } from '../utils/dateUtils';
 
-function formatDate(d) {
-  if (!d) return '-';
-  return new Date(d).toLocaleDateString('it-IT');
-}
+const STATUS_CLASS = { upcoming: 'badge-upcoming', active: 'badge-active', completed: 'badge-played' };
 
 export default function TournamentsPage() {
   const { user } = useAuth();
