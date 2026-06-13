@@ -1,45 +1,28 @@
 services:
-  server:
-    container_name: craievich-server
-    build: ./server
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=sportbooking
-      - DB_USER=postgres
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - JWT_SECRET=${JWT_SECRET:-changeme_use_env_file_in_production}
-      - PORT=3000
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-
-  client:
-    container_name: craievich-client
-    build: ./client
+  mongo:
+    image: mongo:7
+    container_name: sport_mongo_Craievich
+    restart: always
     ports:
-      - "8080:80"
-    depends_on:
-      - server
-    restart: unless-stopped
-
-  db:
-    container_name: craievich-db
-    image: postgres:16-alpine
-    environment:
-      - POSTGRES_DB=sportbooking
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - "27017:27017"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sport_backend_Craievich
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      PORT: 3001
+      MONGO_URL: mongodb://mongo:27017/sport
+      JWT_SECRET: segreto123
+      JWT_EXPIRES: 7d
 
 volumes:
-  pgdata:
+  mongo_data:

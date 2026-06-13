@@ -1,0 +1,524 @@
+/* ===================================================
+   APP
+=================================================== */
+
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fdf2f8 0%, #f5f0ff 100%);
+  color: #3b1f4a;
+}
+
+/* ===================================================
+   HEADER / NAVBAR
+=================================================== */
+
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #be185d 0%, #9333ea 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.3);
+}
+
+.main-header-top {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.user-status {
+  position: relative;
+  white-space: nowrap;
+}
+
+.user-status-btn {
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 14px;
+  border-radius: 20px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.user-status-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.user-status-passive {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.user-status-passive:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border: 1px solid #fce7f3;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(190, 24, 93, 0.15);
+  padding: 16px;
+  min-width: 180px;
+  z-index: 100;
+}
+
+.dropdown-name {
+  font-weight: 700;
+  color: #3b1f4a;
+  margin: 0 0 2px;
+  font-size: 14px;
+}
+
+.dropdown-username {
+  color: #9d6b8a;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.dropdown-logout {
+  width: 100%;
+  font-size: 13px;
+  padding: 8px;
+}
+
+.main-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.main-header p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.main-nav {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  overflow-x: auto;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.nav-tab {
+  padding: 8px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.2px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: white;
+  text-decoration: none;
+}
+
+.nav-tab.active {
+  background: white;
+  border-color: white;
+  color: #be185d;
+  text-decoration: none;
+}
+
+/* ===================================================
+   LAYOUT
+=================================================== */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px;
+  min-height: calc(100vh - 140px);
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(190, 24, 93, 0.12);
+}
+
+.section-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  color: #be185d;
+}
+
+.section-header p {
+  font-size: 14px;
+  color: #9d6b8a;
+  margin: 0;
+}
+
+/* ===================================================
+   CARDS
+=================================================== */
+
+.cards-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.card {
+  padding: 24px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid #fce7f3;
+  box-shadow: 0 2px 12px rgba(190, 24, 93, 0.06);
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(190, 24, 93, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-header-compact {
+  margin-bottom: 8px;
+}
+
+.card h3 {
+  margin: 0;
+  color: #9333ea;
+}
+
+/* ===================================================
+   FORM
+=================================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group-spaced {
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 2px;
+  border: none;
+  border-bottom: 2px solid #f0abcb;
+  border-radius: 0;
+  background: transparent;
+  color: #3b1f4a;
+}
+
+.form-input::placeholder {
+  color: #c084a8;
+}
+
+.form-input:focus {
+  outline: none;
+  border-bottom-color: #be185d;
+  box-shadow: none;
+}
+
+/* ===================================================
+   BUTTONS
+=================================================== */
+
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  color: white;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary   { background: linear-gradient(135deg, #be185d, #9333ea); }
+.btn-success   { background: linear-gradient(135deg, #059669, #0d9488); }
+.btn-danger    { background: linear-gradient(135deg, #e11d48, #be123c); }
+.btn-secondary { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+
+.btn:hover {
+  opacity: 0.88;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===================================================
+   LISTS / UNIFIED CARDS
+=================================================== */
+
+.list-container {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.item,
+.entity-card,
+.info-card,
+.muted-box {
+  border-radius: 12px;
+  background: #fff7fb;
+}
+
+.item {
+  padding: 16px;
+  border-left: 4px solid #be185d;
+}
+
+.item.free {
+  border-left-color: #059669;
+}
+
+.item.busy {
+  border-left-color: #f43f5e;
+}
+
+.entity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.entity-card {
+  padding: 16px;
+  border-left: 4px solid #9333ea;
+}
+
+.info-card {
+  padding: 16px;
+  border: 1px solid #fce7f3;
+}
+
+.muted-box {
+  padding: 16px;
+  border: 1px dashed #f0abcb;
+  color: #9d6b8a;
+}
+
+/* ===================================================
+   ACTIONS / ROW
+=================================================== */
+
+.inline-input-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.small-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.small-actions button {
+  padding: 6px 12px;
+  border: 1.5px solid #f0abcb;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #be185d;
+}
+
+.small-actions button:hover {
+  background: #fff0f7;
+  border-color: #be185d;
+}
+
+/* ===================================================
+   TEXT
+=================================================== */
+
+.compact-text,
+.helper-text {
+  font-size: 13px;
+}
+
+.text-muted,
+.helper-text {
+  color: #9d6b8a;
+}
+
+.compact-text-spaced {
+  margin: 4px 0 0;
+}
+
+.helper-text {
+  margin: 0;
+}
+
+.result-title {
+  font-weight: 600;
+  margin: 0;
+  color: #be185d;
+}
+
+/* ===================================================
+   SPACING HELPERS
+=================================================== */
+
+.mt-xs { margin-top: 8px; }
+.mt-sm { margin-top: 12px; }
+.mt-md { margin-top: 16px; }
+
+.mb-md { margin-bottom: 16px; }
+
+.details-stack {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.output-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* ===================================================
+   LOGIN PAGE
+=================================================== */
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-card h3 {
+  margin-bottom: 16px;
+}
+
+.login-divider {
+  text-align: center;
+  font-size: 13px;
+  color: #9d6b8a;
+  margin: 4px 0;
+}
+
+/* ===================================================
+   SEARCH PAGE
+=================================================== */
+
+.search-category-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-pill {
+  padding: 8px 22px;
+  border: 2px solid #f0abcb;
+  border-radius: 999px;
+  background: transparent;
+  color: #be185d;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.search-pill:hover {
+  background: #fff0f7;
+}
+
+.search-pill-active {
+  background: linear-gradient(135deg, #be185d, #9333ea);
+  border-color: transparent;
+  color: white;
+}
+
+.search-bar-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.search-bar-input {
+  flex: 1;
+}
+
+.user-detail-inline {
+  margin-top: 8px;
+  padding: 16px;
+  background: #fdf2f8;
+  border-left: 4px solid #9333ea;
+  border-radius: 0 12px 12px 0;
+}
+
+.detail-section-label {
+  font-weight: 700;
+  color: #9333ea;
+  margin-bottom: 10px;
+}
+
+/* ===================================================
+   STATES
+=================================================== */
+
+.selected-outline {
+  outline: 2px solid #be185d;
+}
+
+.selected-outline-success {
+  outline-color: #059669;
+}
+
+/* ===================================================
+   RESPONSIVE
+=================================================== */
+
+@media (max-width: 900px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .main-title {
+    font-size: 28px;
+  }
+}

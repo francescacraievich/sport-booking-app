@@ -5,22 +5,18 @@ Web application to book sports fields and manage amateur tournaments.
 
 ## Stack
 
-- **Frontend**: React 18 + React Router, built with Vite and served by nginx
-- **Backend**: Node.js + Express, REST API with JWT authentication (httpOnly cookie)
-- **Database**: PostgreSQL 16
-- **Containerization**: Docker Compose (3 containers)
-
-The nginx container serves the React build and proxies `/api` requests to the backend — the browser always talks to a single origin, no CORS needed.
+- **Frontend**: React 18 + React Router (Create React App)
+- **Backend**: Node.js + Express, REST API with JWT authentication
+- **Database**: MongoDB 7
+- **Containerization**: Docker Compose
 
 ## How to run
-
-Requires Docker. On Windows and Mac, Docker Desktop must be open before running any command.
 
 ```bash
 docker compose up --build
 ```
 
-The app will be available at **<http://localhost:8080>**
+The app will be available at **<http://localhost:3001>**
 
 On subsequent runs (no code changes):
 
@@ -34,35 +30,43 @@ To stop:
 docker compose down
 ```
 
-## Database
+## Seed data
 
-On first startup, PostgreSQL automatically executes `db/init.sql`, which creates all the tables and seeds the 5 sports fields with hourly time slots (9:00–21:00). No other data is pre-loaded — users, tournaments and bookings are created through the app.
-
-Data is stored in a Docker named volume (`pgdata`) and persists between restarts. To reset the database to its initial state:
+To populate the database with sample users, fields, tournaments and players, run the seed script inside the running backend container:
 
 ```bash
-docker compose down -v
-docker compose up
+docker exec sport_backend_Craievich npm run seed
 ```
+
+Default accounts after seeding:
+
+| Username  | Password |
+| --------- | -------- |
+| francesca | 123      |
+| marco     | 123      |
+
+## Features
+
+- **Authentication** — register and log in with username and password
+- **Fields** — view available sports fields and book time slots
+- **Tournaments** — create and manage tournaments with teams, players, a round-robin match schedule and live standings
+- **Search** — search teams, players and users
 
 ## Project structure
 
-```
+```text
 sport-booking-app/
-├── client/              # React SPA
-│   ├── src/
-│   │   ├── pages/       # one component per route
-│   │   ├── components/  # Navbar, ProtectedRoute
-│   │   └── context/     # AuthContext
-│   ├── nginx.conf       # serves SPA + proxies /api to backend
-│   └── Dockerfile       # multi-stage: Vite build → nginx
-├── server/              # Node.js + Express
+├── backend/
+│   ├── models/        # Mongoose schemas
+│   ├── routes/        # Express routes
+│   ├── seed/          # Database seed script
+│   ├── Dockerfile     # builds frontend + starts backend
+│   └── server.js
+├── frontend/
 │   └── src/
-│       ├── routes/      # one file per resource
-│       ├── middleware/   # JWT auth, rate limiting
-│       └── app.js
-├── db/
-│   └── init.sql         # schema + seed data
+│       ├── pages/     # one component per route
+│       ├── api.js     # API calls
+│       └── App.js
 └── docker-compose.yml
 ```
 
